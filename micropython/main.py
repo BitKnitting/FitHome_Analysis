@@ -9,7 +9,7 @@ import machine
 # ***** Set up debug LEDs
 # A red one for errors
 # A green one for ok.
-TIME_BETWEEN_READINGS = 2
+TIME_BETWEEN_READINGS = 1
 
 led_red = machine.Pin(27, machine.Pin.OUT)
 led_green = machine.Pin(32, machine.Pin.OUT)
@@ -44,7 +44,7 @@ else:
 
     # *******************************************/
     # Delay starting up to accomodate plugging in energy monitor after microcontroller.
-    time.sleep(10)
+    time.sleep(2)
 
     try:
         # Get reading and then send reading.
@@ -77,9 +77,10 @@ else:
                     if (sys0 == 0xFFFF or sys0 == 0):
                         raise OSError(SysStatusError().number,
                                       SysStatusError().explanation)
-                    power_reading = energy_sensor.active_power_A+energy_sensor.active_power_C
-                    current_reading = energy_sensor.line_currentA+energy_sensor.line_currentC
-                    s.send(power_reading, current_reading)
+                    Pa = energy_sensor.total_active_power
+                    Pr = energy_sensor.total_reactive_power
+                    i = energy_sensor.line_currentA+energy_sensor.line_currentC
+                    s.send(Pa, Pr, i)
                     blink(led_green, 1)
                     time.sleep(TIME_BETWEEN_READINGS)
                 except OSError as err:

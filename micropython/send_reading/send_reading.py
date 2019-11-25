@@ -38,18 +38,19 @@ class SendReading:
         if self.project_id is None:
             raise OSError(NoDBidError().number, NoDBidError().explanation)
 
-    def send(self, power, current):
+    def send(self, Pa, Pr, i):
         # Assumes attached to wifi
         wlan_sta = network.WLAN(network.STA_IF)
         if not wlan_sta.isconnected:
             raise OSError(NoWiFiError().number,
                           NoWiFiError().explanation)
 
-        data = '{'+'"P":{},"I":{}'.format(power, current) + '}'
-        print(data)
-        path = self._make_path()
+        payload = '{"I":' + str(i) + ',"Pa":' + str(Pa) + ',"Pr":'+str(Pr)+'}'
+        url = self.project_id
+        headers = {'Content-Type': "application/json"}
         try:
-            response = requests.put(path, data=data)
+            response = requests.request(
+                "POST", url, data=payload, headers=headers)
         except IndexError as e:
             print('error: {}'.format(e))
             return False
@@ -72,6 +73,7 @@ class SendReading:
         # Set micropython's date/time
         rtc = machine.RTC()
         rtc.datetime((year, month, day, dayofweek, hour, minute, second, 0))
+    # Used when writing to firebase RT.
 
     def _make_path(self):
         # Get the time and convert to Unix epoch.

@@ -1,8 +1,8 @@
-
 from atm90e32_u import ATM90e32
 from app_error import NoMonitor, SysStatusError, NoMonitorNameError, NoWiFiError, NoDBidError, blink
 import machine
 import time
+import urequests as requests
 
 
 class MyTest:
@@ -51,19 +51,35 @@ class MyTest:
 
     def get_power(self):
         # Look at active power
-        print(f'Total active power: {self.energy_sensor.total_active_power}')
-        print(f'Active power on line A: {self.energy_sensor.active_power_A}')
-        print(f'Active power on line C: {self.energy_sensor.active_power_C}')
+        print('Total active power: {}'.format(
+            self.energy_sensor.total_active_power))
+        print('Active power on line A: {}'.format(
+            self.energy_sensor.active_power_A))
+        print('Active power on line C: {}'.format(
+            self.energy_sensor.active_power_C))
         # Are the two readings close?
         print(
-            f'Active Power A+C {self.energy_sensor.active_power_A+self.energy_sensor.active_power_C}')
+            'Active Power A+C {}'.format(self.energy_sensor.active_power_A+self.energy_sensor.active_power_C))
         # Look at reactive power
         print(
-            f'Total reactive power: {self.energy_sensor.total_reactive_power}')
+            'Total reactive power: {}'.format(self.energy_sensor.total_reactive_power))
         print(
-            f'Reactive power on line A: {self.energy_sensor.reactive_power_A}')
+            'Reactive power on line A: {}'.format(self.energy_sensor.reactive_power_A))
         print(
-            f'Reactive power on line C: {self.energy_sensor.reactive_power_C}')
+            'Reactive power on line C: {}'.format(self.energy_sensor.reactive_power_C))
         # Are the two readings close?
         print(
-            f'Reactive Power A+C {self.energy_sensor.reactive_power_A+self.energy_sensor.reactive_power_C}')
+            'Reactive Power A+C {}'.format(self.energy_sensor.reactive_power_A+self.energy_sensor.reactive_power_C))
+
+    # Send reading to the database
+    def send_reading(self):
+        # here we're testing sending to our mongodb on rasp pi.
+        i = self.energy_sensor.line_currentA+self.energy_sensor.line_currentC
+        Pa = self.energy_sensor.total_active_power
+        Pr = self.energy_sensor.total_reactive_power
+        payload = '{"I":' + str(i) + ',"Pa":' + str(Pa) + ',"Pr":'+str(Pr)+'}'
+        print(payload)
+        url = "http://192.168.86.209:4001/monitor"
+        headers = {'Content-Type': "application/json"}
+        response = requests.request("POST", url, data=payload, headers=headers)
+        print(response.text)

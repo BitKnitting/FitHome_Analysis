@@ -23,7 +23,7 @@ def monitor():
             monitor_collection = mongo.db.monitor
             # E.g.: Reading came in from monitor.
             reading = {"timestamp": timestamp_str,
-                       "P": req['P'], "I": req['I'], "RP": req['RP'], "microwave": MICROWAVE_ON, }
+                       "Pa": req['Pa'], "I": req['I'], "Pr": req['Pr'], "microwave": MICROWAVE_ON, }
             monitor_collection.insert(reading)
         except KeyError as error:
             return (f'The key {error} does not exist.', 400)

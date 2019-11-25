@@ -1,4 +1,6 @@
 {
-    "monitor": "flower-09282019",
-    "project_id": "fithome-9ebbd"
+    "ssid": "happyday",
+    "monitor": "monitor_11242019",
+    "project_id": "http://192.168.86.209:4001/monitor",
+    "password": "poi098lkj"
 }
